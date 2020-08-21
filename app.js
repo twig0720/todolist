@@ -1,5 +1,6 @@
 //jshint eversion:6
 var items = ["buy","food","cook"];
+var workItems = [];
 
 const express = require("express");
 
@@ -27,21 +28,53 @@ app.get("/", function(req, res) {
   var day = today.toLocaleDateString("en-US",options);
 
   res.render("lists", {
-    kindOfDay: day,
+    listTitle: day,
     newListItems: items
   });
 
-
-
 });
+
+app.get("/work",function(req,res){
+  res.render("lists", {
+    listTitle: "Work List",
+    newListItems: workItems
+  });
+})
+
 
 app.post("/",function(req,res){
-  var item = req.body.newItem;
-  items.push(item);
+  let item = req.body.newItem;
+  if(req.body.list === "Work List"){
+    workItems.push(item);
+    res.redirect("/work");
+  }else{
+    items.push(item);
+    res.redirect("/");
+  };
 
-  res.redirect("/");
 
 });
+
+// app.post("/work",function(req,res){
+//   let item = req.body.newItem;
+//   workItems.push(item);
+//   res.redirect("/work");
+// });
+
+// approach #1
+// app.post('/:index', function(req, res) {
+//   const index = req.params.index;
+//   items.splice(index, 1);
+//
+//   res.redirect('/');
+// })
+// approach #2
+
+app.post('/delete', function(req, res) {
+  const index = req.body.index;
+  items.splice(index, 1);
+  res.redirect('/');
+})
 
 
 app.listen(3000, function() {
